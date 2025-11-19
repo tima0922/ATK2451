@@ -3,259 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TIFT Расписание</title>
-    <meta name="theme-color" content="#6366f1">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta name="theme-color" content="#7c3aed">
+    <title>TIFT • Расписание</title>
+    <link rel="manifest" href="data:application/manifest+json,{
+        \"name\": \"TIFT Расписание\",
+        \"short_name\": \"TIFT\",
+        \"start_url\": \".\",
+        \"display\": \"standalone\",
+        \"background_color\": \"#0f0a1e\",
+        \"theme_color\": \"#7c3aed\",
+        \"icons\": [{
+            \"src\": \"https://api.dicebear.com/7.x/shapes/svg?seed=TIFT\",
+            \"sizes\": \"192x192\",
+            \"type\": \"image/svg+xml\"
+        }]
+    }">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --border: #e2e8f0;
+            --bg: linear-gradient(135deg, #0f0a1e 0%, #1a0f30 100%);
+            --card: rgba(30, 20, 60, 0.65);
+            --glass: rgba(255, 255, 255, 0.08);
+            --accent: #7c3aed;
+            --accent2: #ec4899;
+            --text: #e0d6ff;
+            --text2: #b8a9ff;
             --success: #10b981;
             --warning: #f59e0b;
-            --shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
         }
-        .dark {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #f1f5f9;
-            --text-light: #94a3b8;
-            --border: #334155;
+        .light {
+            --bg: linear-gradient(135deg, #f8f4ff 0%, #e0d6ff 100%);
+            --card: rgba(255, 255, 255, 0.75);
+            --glass: rgba(255, 255, 255, 0.6);
+            --text: #1e0b4a;
+            --text2: #4c1d95;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            padding-bottom: 80px;
-            transition: all 0.3s;
+            overflow-x: hidden;
+            padding-bottom: 90px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
         }
         .header {
-            background: var(--primary);
-            color: white;
-            padding: 20px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 20px 20px 15px;
             text-align: center;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             z-index: 1000;
-            box-shadow: 0 4px 20px rgba(99,102,241,0.3);
         }
         .header h1 {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #7c3aed, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
         }
         .header p {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-top: 4px;
+            font-size: 15px;
+            opacity: 0.8;
+            font-weight: 500;
         }
+
         .container {
-            margin-top: 90px;
-            padding: 0 15px;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .card {
-            background: var(--card);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            transition: all 0.3s;
-        }
-        .search-box {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        .search-box input {
-            width: 100%;
-            padding: 16px 50px 16px 20px;
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            font-size: 16px;
-            background: var(--card);
-            color: var(--text);
-        }
-        .search-box i {
-            position: absolute;
-            right: 18px;
-            top: 18px;
-            color: var(--primary);
+            padding: 100px 20px 20px;
+            max-width: 520px;
+            margin: 0 auto;
         }
 
-        /* День недели */
-        .day-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 25px 0 15px;
-            padding: 0 5px;
+        /* Живой прогресс текущей пары */
+        .current-progress {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
         }
-        .day-header h2 {
-            font-size: 22px;
-            font-weight: 700;
-        }
-        .today-badge {
-            background: var(--primary);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
+        .current-progress-fill {
+            height: 100%;
+            width: 57%;
+            background: linear-gradient(90deg, var(--success), #34d399);
+            border-radius: 3px;
+            transition: width 1s ease;
         }
 
-        /* Пара */
+        /* Карточки пар с 3D-эффектом */
         .lesson {
             background: var(--card);
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 14px;
-            border-left: 5px solid var(--primary);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 22px;
+            margin-bottom: 18px;
+            transform: perspective(1000px) rotateX(0deg);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
         }
+        .lesson::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(124,58,237,0.15), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+        .lesson:hover::before, .lesson.now::before { opacity: 1; }
         .lesson.now {
-            border-left-color: var(--success);
-            box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
-            transform: scale(1.02);
+            border-color: var(--success);
+            box-shadow: 0 20px 40px rgba(16,185,129,0.3);
+            transform: scale(1.03) translateY(-5px);
         }
         .lesson.next {
-            border-left-color: var(--warning);
-            animation: pulse 2s infinite;
+            border-color: var(--warning);
+            box-shadow: 0 0 30px rgba(245,158,11,0.4);
+            animation: glow 3s infinite;
         }
-        @keyframes pulse {
-            0% { box-shadow: 0 4px 15px rgba(245,158,11,0.2); }
-            50% { box-shadow: 0 4px 25px rgba(245,158,11,0.4); }
-            100% { box-shadow: 0 4px 15px rgba(245,158,11,0.2); }
+        @keyframes glow {
+            0%,100% { box-shadow: 0 0 30px rgba(245,158,11,0.4); }
+            50% { box-shadow: 0 0 50px rgba(245,158,11,0.6); }
         }
+
         .lesson-time {
+            font-size: 19px;
             font-weight: 700;
-            font-size: 18px;
-            color: var(--primary);
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
         }
         .lesson-name {
-            font-size: 17px;
-            font-weight: 600;
-            margin-bottom: 6px;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
         .lesson-info {
-            font-size: 14px;
-            color: var(--text-light);
+            font-size: 15px;
+            opacity: 0.9;
             line-height: 1.5;
         }
         .lesson-room {
-            background: var(--primary);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            display: inline-block;
-            margin-top: 8px;
-        }
-        .favorite-btn {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            background: none;
-            border: none;
-            font-size: 22px;
-            cursor: pointer;
-            color: #cbd5e1;
-        }
-        .favorite-btn.active {
-            color: #f59e0b;
+            top: 18px; right: 18px;
+            background: rgba(124,58,237,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
         }
 
-        /* Нижняя навигация */
+        /* Нижняя навигация — неоновая */
         .navbar {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card);
-            border-top: 1px solid var(--border);
+            bottom: 0; left: 0; right: 0;
+            background: var(--glass);
+            backdrop-filter: blur(30px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 0 20px;
             display: flex;
-            padding: 10px 0;
             z-index: 1000;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
         }
         .nav-item {
             flex: 1;
             text-align: center;
-            padding: 10px;
-            color: var(--text-light);
-            font-size: 12px;
-            transition: all 0.3s;
-        }
-        .nav-item i {
-            font-size: 24px;
-            display: block;
-            margin-bottom: 4px;
+            padding: 12px;
+            border-radius: 20px;
+            margin: 0 8px;
+            transition: all 0.4s;
+            position: relative;
         }
         .nav-item.active {
-            color: var(--primary);
+            background: rgba(124,58,237,0.3);
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(124,58,237,0.4);
+        }
+        .nav-item i {
+            font-size: 26px;
+            display: block;
+            margin-bottom: 6px;
+            background: linear-gradient(90deg, #7c3aed, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .nav-item span {
+            font-size: 12px;
+            font-weight: 600;
         }
 
-        /* Вкладки */
-        .tab { display: none; }
-        .tab.active { display: block; }
-
-        /* Тема переключатель */
         .theme-toggle {
             position: fixed;
             top: 100px;
             right: 20px;
-            background: var(--card);
-            width: 60px;
-            height: 60px;
+            width: 60px; height: 60px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 28px;
-            box-shadow: var(--shadow);
             z-index: 999;
-            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: float 6s infinite ease-in-out;
+        }
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
-        /* Уведомление о следующей паре */
-        .next-lesson-alert {
-            position: fixed;
-            top: 90px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--warning);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 50px;
-            font-weight: 600;
-            box-shadow: var(--shadow);
-            z-index: 998;
-            animation: slideDown 0.5s;
+        /* Скелетон при загрузке */
+        .skeleton {
+            background: linear-gradient(90deg, #2a1a4a 25%, #3a2a5a 50%, #2a1a4a 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 16px;
+            height: 120px;
+            margin-bottom: 18px;
         }
-        @keyframes slideDown {
-            from { transform: translate(-50%, -100%); opacity: 0; }
-            to { transform: translate(-50%, 0); opacity: 1; }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>TIFT Расписание</h1>
-        <p>Группа ИС-22</p>
+        <h1>T I F T</h1>
+        <p>ИС-22 • 2 курс • Сегодня: 19 ноября</p>
     </div>
 
     <div class="theme-toggle" onclick="toggleTheme()">
@@ -263,142 +249,92 @@
     </div>
 
     <div class="container">
-
-        <!-- Поиск -->
-        <div class="search-box">
-            <input type="text" placeholder="Поиск пары, преподавателя..." onkeyup="searchLessons()">
-            <i class="fas fa-search"></i>
+        <div class="current-progress">
+            <div class="current-progress-fill"></div>
         </div>
 
-        <!-- Вкладки -->
-        <div id="today" class="tab active">
-            <div class="day-header">
-                <h2>Сегодня</h2>
-                <div class="today-badge">19 ноября, Вт</div>
-            </div>
-
-            <div class="lesson">
-                <div class="lesson-time">08:30 - 10:00</div>
-                <div class="lesson-name">Программирование на Java</div>
-                <div class="lesson-info">Преп. Иванов А.В.</div>
-                <div class="lesson-room">Ауд. 305</div>
-                <button class="favorite-btn active" onclick="toggleFav(this)">★</button>
-            </div>
-
-            <div class="lesson now">
-                <div class="lesson-time">10:10 - 11:40</div>
-                <div class="lesson-name">Базы данных</div>
-                <div class="lesson-info">Преп. Петрова Е.С.</div>
-                <div class="lesson-room">Ауд. 412</div>
-                <button class="favorite-btn" onclick="toggleFav(this)">★</button>
-            </div>
-
-            <div class="lesson next">
-                <div class="lesson-time">12:00 - 13:30</div>
-                <div class="lesson-name">Веб-программирование</div>
-                <div class="lesson-info">Преп. Сидоров К.М.</div>
-                <div class="lesson-room">Ауд. 210</div>
-                <button class="favorite-btn" onclick="toggleFav(this)">★</button>
-            </div>
-
-            <div class="lesson">
-                <div class="lesson-time">14:00 - 15:30</div>
-                <div class="lesson-name">Английский язык</div>
-                <div class="lesson-info">Преп. Johnson M.</div>
-                <div class="lesson-room">Ауд. 108</div>
-            </div>
+        <!-- Пример пар -->
+        <div class="lesson">
+            <div class="lesson-time">08:30 – 10:00</div>
+            <div class="lesson-name">Программирование на Java</div>
+            <div class="lesson-info">Иванов Алексей Владимирович</div>
+            <div class="lesson-room">305</div>
         </div>
 
-        <div id="week" class="tab">
-            <div class="day-header"><h2>Понедельник</h2></div>
-            <div class="lesson"><div class="lesson-time">08:30</div><div class="lesson-name">Математика</div><div class="lesson-room">301</div></div>
-            <div class="lesson"><div class="lesson-time">10:10</div><div class="lesson-name">Физика</div><div class="lesson-room">Лаб. 5</div></div>
-
-            <div class="day-header"><h2>Среда</h2></div>
-            <div class="lesson"><div class="lesson-time">12:00</div><div class="lesson-name">ООП</div><div class="lesson-room">305</div></div>
+        <div class="lesson now">
+            <div class="lesson-time">10:10 – 11:40</div>
+            <div class="lesson-name">Архитектура баз данных</div>
+            <div class="lesson-info">Петрова Елена Сергеевна • Лекция</div>
+            <div class="lesson-room">412</div>
         </div>
 
-        <div id="favorites" class="tab">
-            <p style="text-align:center; padding:40px; color:var(--text-light);">
-                <i class="fas fa-heart" style="font-size:48px; color:#f59e0b; margin-bottom:20px; display:block;"></i>
-                Здесь будут ваши избранные пары
-            </p>
+        <div class="lesson next">
+            <div class="lesson-time">12:00 – 13:30</div>
+            <div class="lesson-name">Фронтенд-разработка</div>
+            <div class="lesson-info">Сидоров Кирилл • React + TypeScript</div>
+            <div class="lesson-room">210</div>
         </div>
 
-        <div id="settings" class="tab">
-            <div class="card">
-                <h3>Настройки</h3>
-                <p>Группа: ИС-22</p>
-                <p>Поток: Информатика и вычислительная техника</p>
-                <p>Курс: 2</p>
-            </div>
+        <div class="lesson">
+            <div class="lesson-time">14:00 – 15:30</div>
+            <div class="lesson-name">Английский язык (B2)</div>
+            <div class="lesson-info">Мария Джонсон • Разговорная практика</div>
+            <div class="lesson-room">108</div>
         </div>
     </div>
 
-    <!-- Нижняя навигация -->
     <div class="navbar">
-        <div class="nav-item active" onclick="openTab('today', this)">
-            <i class="fas fa-home"></i>
-            <div>Сегодня</div>
+        <div class="nav-item active">
+            <i class="fas fa-calendar-day"></i>
+            <span>Сегодня</span>
         </div>
-        <div class="nav-item" onclick="openTab('week', this)">
+        <div class="nav-item">
             <i class="fas fa-calendar-week"></i>
-            <div>Неделя</div>
+            <span>Неделя</span>
         </div>
-        <div class="nav-item" onclick="openTab('favorites', this)">
-            <i class="fas fa-heart"></i>
-            <div>Избранное</div>
+        <div class="nav-item">
+            <i class="fas fa-star"></i>
+            <span>Избранное</span>
         </div>
-        <div class="nav-item" onclick="openTab('settings', this)">
-            <i class="fas fa-cog"></i>
-            <div>Настройки</div>
+        <div class="nav-item">
+            <i class="fas fa-user-graduate"></i>
+            <span>Профиль</span>
         </div>
-    </div>
-
-    <!-- Уведомление о следующей паре -->
-    <div class="next-lesson-alert">
-        <i class="fas fa-bell"></i> Следующая пара через 15 минут — Веб-программирование (210)
     </div>
 
     <script>
-        // Переключение вкладок
-        function openTab(tabName, el) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            el.classList.add('active');
+        // Тёмная/светлая тема по системе + переключатель
+        if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+            document.body.classList.add('light');
+            document.getElementById('themeIcon').classList.replace('fa-moon', 'fa-sun');
         }
 
-        // Поиск
-        function searchLessons() {
-            let input = document.querySelector('.search-box input').value.toLowerCase();
-            document.querySelectorAll('.lesson').forEach(lesson => {
-                let text = lesson.textContent.toLowerCase();
-                lesson.style.display = text.includes(input) ? 'block' : 'none';
+        function toggleTheme() {
+            document.body.classList.toggle('light');
+            const isLight = document.body.classList.contains('light');
+            document.getElementById('themeIcon').classList.toggle('fa-sun', isLight);
+            document.getElementById('themeIcon').classList.toggle('fa-moon', !isLight);
+        }
+
+        // Прогресс-бар текущей пары (пример)
+        setInterval(() => {
+            const now = new Date();
+            const hour = now.getHours() + now.getMinutes()/60;
+            let progress = 0;
+            if (hour >= 10.166 && hour < 11.666) progress = (hour - 10.166) / 1.5 * 100;
+            document.querySelector('.current-progress-fill').style.width = progress + '%';
+        }, 30000);
+
+        // 3D-наклон карточек при движении телефона
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', (e) => {
+                const tiltX = e.gamma / 90 * 20;
+                const tiltY = e.beta / 90 * 20;
+                document.querySelectorAll('.lesson').forEach(card => {
+                    card.style.transform = `perspective(1000px) rotateX(${tiltY}deg) rotateY(${tiltX}deg)`;
+                });
             });
         }
-
-        // Избранное
-        function toggleFav(btn) {
-            btn.classList.toggle('active');
-        }
-
-        // Тёмная тема
-        function toggleTheme() {
-            document.body.classList.toggle('dark');
-            let icon = document.getElementById('themeIcon');
-            if (document.body.classList.contains('dark')) {
-                icon.classList.replace('fa-moon', 'fa-sun');
-            } else {
-                icon.classList.replace('fa-sun', 'fa-moon');
-            }
-        }
-
-        // Авто-определение текущей пары (пример)
-        setTimeout(() => {
-            document.querySelectorAll('.lesson')[1].classList.add('now');
-            document.querySelectorAll('.lesson')[2].classList.add('next');
-        }, 1000);
     </script>
 </body>
 </html>
