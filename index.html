@@ -3,193 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TIFT Расписание</title>
-    <meta name="theme-color" content="#6366f1">
-    <link rel="manifest" href="data:application/manifest+json,{
-      "name":"TIFT Расписание",
-      "short_name":"TIFT",
-      "start_url":".",
-      "display":"standalone",
-      "background_color":"#0f172a",
-      "theme_color":"#6366f1",
-      "icons":[{"src":"https://api.dicebear.com/8.x/shapes/svg?seed=TIFT&size=192","sizes":"192x192","type":"image/svg+xml"}]
-    }">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <title>АТК-2451 | Легенды IT ТИТ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root{--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--accent:#6366f1;--success:#10b981;--warning:#f59e0b;--border:#334155}
-        .light{--bg:#f8fafc;--card:#ffffff;--text:#1e293b;--accent:#4f46e5;--border:#e2e8f0}
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:90px;overflow-x:hidden;transition:all .4s}
-        .header{position:fixed;top:0;left:0;right:0;background:var(--card);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:20px;z-index:1000;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.3)}
-        .header h1{font-size:28px;font-weight:800;background:linear-gradient(90deg,#6366f1,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .header p{font-size:15px;opacity:.9;margin-top:4px}
-        .group-select{margin-top:80px;padding:15px;text-align:center}
-        .group-select select{background:var(--card);color:var(--text);border:2px solid var(--accent);border-radius:16px;padding:12px 20px;font-size:18px;width:90%;max-width:400px}
-        .container{padding:20px;max-width:500px;margin:0 auto}
-        .day-name{font-size:32px;font-weight:800;text-align:center;margin:30px 0 20px;background:linear-gradient(90deg,#6366f1,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .progress-bar{height:8px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;margin:20px 0}
-        .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--success),#34d399);border-radius:4px;transition:width .8s ease}
-        .lessons{perspective:1000px}
-        .lesson{background:var(--card);border-radius:24px;padding:20px;margin:16px 0;border-left:6px solid var(--accent);box-shadow:0 10px 30px rgba(0,0,0,.2);transition:all .4s;transform:translateZ(0)}
-        .lesson.now{border-left-color:var(--success);box-shadow:0 0 40px rgba(16,185,129,.4);transform:scale(1.03) translateZ(50px)}
-        .lesson.next{border-left-color:var(--warning);animation:pulse 2s infinite}
-        @keyframes pulse{0%,100%{box-shadow:0 0 40px rgba(245,158,11,.4)}50%{box-shadow:0 0 60px rgba(245,158,11,.7)}}
-        .lesson-time{font-size:20px;font-weight:800;color:var(--accent);margin-bottom:8px}
-        .lesson-name{font-size:19px;font-weight:700;margin-bottom:6px}
-        .lesson-info{font-size:15px;opacity:.9}
-        .room-tag{position:absolute;top:16px;right:16px;background:var(--accent);color:white;padding:8px 16px;border-radius:16px;font-weight:700;font-size:14px}
-        .navbar{position:fixed;bottom:0;left:0;right:0;background:var(--card);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;padding:10px 0;z-index:1000}
-        .nav-btn{flex:1;text-align:center;padding:12px;color:var(--text);font-size:13px;transition:all .3s}
-        .nav-btn.active{color:var(--accent);transform:scale(1.15)}
-        .nav-btn i{font-size:26px;display:block;margin-bottom:4px}
-        .swipe-hint{text-align:center;margin-top:50px;opacity:.6;font-size:14px}
-        .theme-btn{position:fixed;top:100px;right:20px;width:60px;height:60px;background:var(--card);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;z-index:999;box-shadow:0 10px 30px rgba(0,0,0,.4);cursor:pointer}
+        :root {
+            --bg: #0d0d1a;
+            --accent: #00ffea;
+            --text: #e0e0ff;
+            --card: #1a1a2e;
+        }
+        
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Roboto Mono', monospace;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        .matrix {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        header {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .glitch {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(3rem, 10vw, 9rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--accent);
+            text-shadow: 
+                0 0 10px var(--accent),
+                0 0 40px var(--accent),
+                0 0 80px var(--accent);
+            animation: glow 2s infinite alternate;
+        }
+
+        .glitch::before, .glitch::after {
+            content: 'АТК-2451';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+
+        .glitch::before {
+            animation: glitch-1 0.5s infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+            transform: translate(-2px, -2px);
+            color: #ff00ff;
+        }
+
+        .glitch::after {
+            animation: glitch-2 0.5s infinite;
+            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+            transform: translate(2px, 2px);
+            color: #00ffff;
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            margin-top: 20px;
+            opacity: 0.9;
+            letter-spacing: 8px;
+            text-align: center;
+        }
+
+        .cards {
+            padding: 100px 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 234, 0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 1000% 1000%;
+            background: linear-gradient(45deg, transparent, rgba(0,255,234,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.7s;
+            opacity: 0;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+            animation: shine 1.5s;
+        }
+
+        .card:hover {
+            transform: translateY(-20px) scale(1.03);
+            border-color: var(--accent);
+            box-shadow: 0 0 40px rgba(0,255,234,0.4);
+        }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent);
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+
+        .konami {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            color: gold;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 999;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px var(--accent); }
+            to { text-shadow: 0 0 60px var(--accent), 0 0 100px var(--accent); }
+        }
+
+        @keyframes glitch-1 {
+            0%,100% { transform: translate(0); }
+            20% { transform: translate(-5px, -5px); }
+            40% { transform: translate(5px, 5px); }
+            60% { transform: translate(-5px, 5px); }
+            80% { transform: translate(5px, -5px); }
+        }
+
+        @keyframes glitch-2 {
+            0%,100% { transform: translate(0); }
+            20% { transform: translate(5px, 5px); }
+            40% { transform: translate(-5px, -5px); }
+            60% { transform: translate(5px, 5px); }
+            80% { transform: translate(-5px, -5px); }
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>TIFT</h1>
-    <p id="currentDay">Загрузка...</p>
-</div>
+    <canvas class="matrix"></canvas>
 
-<div class="theme-btn" onclick="toggleTheme()">
-    <i class="fas fa-moon" id="themeIcon"></i>
-</div>
+    <header>
+        <div>
+            <h1 class="glitch" data-text="АТК-2451">АТК-2451</h1>
+            <p class="subtitle">Ташкентский университет информационных технологий<br>Прикладная информатика • 2024–2028</p>
+        </div>
+    </header>
 
-<div class="group-select">
-    <select id="groupSelect" onchange="changeGroup()">
-        <option value="ИС-22">ИС-22</option>
-        <option value="ИС-21">ИС-21</option>
-        <option value="ПМ-22">ПМ-22</option>
-        <option value="КН-21">КН-21</option>
-    </select>
-</div>
+    <section class="cards">
+        <div class="card">
+            <h2>Мы — будущие архитекторы цифрового мира</h2>
+            <p>Алгоритмы, нейросети, кибербезопасность, разработка под Android/iOS, DevOps, Big Data — всё это наш хлеб насущный уже с первого курса.</p>
+        </div>
 
-<div class="container">
-    <div class="day-name" id="dayName">Понедельник</div>
-    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
-    
-    <div class="lessons" id="lessonsList">
-        <!-- Здесь будут пары -->
-    </div>
-    
-    <div class="swipe-hint">
-        <i class="fas fa-arrow-left"></i> Свайпай влево/вправо для смены дня <i class="fas fa-arrow-right"></i>
-    </div>
-</div>
+        <div class="card">
+            <h2>Наши суперсилы</h2>
+            <ul style="margin-top: 20px; line-height: 2;">
+                <li>▸ Пишем код чище, чем душа младенца</li>
+                <li>▸ Ломаем баги одним взглядом</li>
+                <li>▸ Делаем дипломы, от которых преподаватели плачут (от счастья)</li>
+                <li>▸ Уже зарабатываем на фрилансе больше, чем некоторые выпускники</li>
+            </ul>
+        </div>
 
-<div class="navbar">
-    <div class="nav-btn active"><i class="fas fa-home"></i><div>Сегодня</div></div>
-    <div class="nav-btn"><i class="fas fa-calendar-week"></i><div>Неделя</div></div>
-    <div class="nav-btn"><i class="fas fa-star"></i><div>Избранное</div></div>
-    <div class="nav-btn"><i class="fas fa-cog"></i><div>Настройки</div></div>
-</div>
+        <div class="card">
+            <h2>Пасхалка для своих</h2>
+            <p>Нажми стрелки: ↑ ↑ ↓ ↓ ← → ← → B A<br><small>(Konami code — мы же айтишники 80 lvl)</small></p>
+        </div>
+    </section>
 
-<script>
-    const groups = {
-        "ИС-22": {
-            "Понедельник": [
-                {time:"08:30-10:00", name:"Java", teacher:"Иванов А.В.", room:"305"},
-                {time:"10:10-11:40", name:"Базы данных", teacher:"Петрова Е.С.", room:"412"},
-                {time:"12:00-13:30", name:"Веб-разработка", teacher:"Сидоров К.", room:"210"}
-            ],
-            "Вторник": [
-                {time:"08:30-10:00", name:"Алгоритмы", teacher:"Козлов", room:"301"},
-                {time:"10:10-11:40", name:"Английский", teacher:"Johnson", room:"108"}
-            ],
-            "Среда": [
-                {time:"10:10-11:40", name:"ООП", teacher:"Смирнов", room:"305"},
-                {time:"12:00-13:30", name:"React", teacher:"Сидоров К.", room:"Лаб 5"}
-            ],
-            "Четверг": [
-                {time:"08:30-10:00", name:"Матан", teacher:"Соколов", room:"401"}
-            ],
-            "Пятница": [
-                {time:"10:10-11:40", name:"Сети", teacher:"Волков", room:"Лаб 3"}
-            ]
-        }
-    };
+    <footer>
+        АТК-2451 — группа, от которой Ташкент ещё не оправился © 2025<br>
+        <small>С любовью и багфиксами от твоих будущих коллег</small>
+    </footer>
 
-    const days = ["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"];
-    let currentDayIndex = new Date().getDay();
+    <div class="konami" id="easter">YOU WIN! 🎰</div>
 
-    function renderDay() {
-        const dayName = days[currentDayIndex];
-        const group = document.getElementById("groupSelect").value;
-        const lessons = groups[group]?.[dayName] || [];
-        
-        document.getElementById("dayName").textContent = dayName;
-        document.getElementById("currentDay").textContent = `${group} • ${new Date().toLocaleDateString("ru")}`;
-        
-        let html = "";
-        const now = new Date();
-        const currentTime = now.getHours() * 60 + now.getMinutes();
-        
-        lessons.forEach((lesson, i) => {
-            const [start, end] = lesson.time.split("-");
-            const startMins = parseInt(start.split(":")[0])*60 + parseInt(start.split(":")[1]);
-            const endMins = parseInt(end.split(":")[0])*60 + parseInt(end.split(":")[1]);
-            const isNow = currentTime >= startMins && currentTime < endMins;
-            const isNext = i > 0 && currentTime < startMins && currentTime > (lessons[i-1]?.endMins || 0);
-            
-            html += `<div class="lesson ${isNow?'now':''} ${isNext?'next':''}">
-                <div class="lesson-time">${lesson.time}</div>
-                <div class="lesson-name">${lesson.name}</div>
-                <div class="lesson-info">${lesson.teacher}</div>
-                <div class="room-tag">${lesson.room}</div>
-            </div>`;
+    <script src="https://cdn.jsdelivr.net/npm/matrix-rain@1.0.0/matrix.min.js"></script>
+    <script>
+        // Matrix rain background
+        const canvas = document.querySelector('.matrix');
+        const matrixRain(canvas);
+
+        // Konami code easter egg
+        let konamiCode = [];
+        const correctCode = [38,38,40,40,37,39,37,39,66,65];
+
+        document.addEventListener('keydown', (e) => {
+            konamiCode.push(e.keyCode);
+            if (konamiCode.length > 10) konamiCode.shift();
+
+            if (JSON.stringify(konamiCode) === JSON.stringify(correctCode)) {
+                document.getElementById('easter').style.opacity = '1';
+                document.getElementById('easter').style.transition = 'all 2s';
+                setTimeout(() => {
+                    document.getElementById('easter').style.opacity = '0';
+                }, 4000);
+
+                // Дополнительный сюрприз: конфетти!
+                confetti({
+                    particleCount: 300,
+                    spread: 360,
+                    origin: { y: 0.6 }
+                });
+                konamiCode = [];
+            }
         });
-        
-        if (!lessons.length) html = "<p style='text-align:center;padding:50px;color:#64748b'>Пар нет — отдыхай!</p>";
-        document.getElementById("lessonsList").innerHTML = html;
-        updateProgress();
-    }
-
-    function updateProgress() {
-        const now = new Date();
-        const mins = now.getHours()*60 + now.getMinutes();
-        let progress = 0;
-        if (mins > 510 && mins < 930) progress = (mins - 510)/420 * 100; // 8:30 — 15:30
-        document.getElementById("progress").style.width = progress + "%";
-    }
-
-    function changeGroup() {
-        localStorage.setItem("tift_group", document.getElementById("groupSelect").value);
-        renderDay();
-    }
-
-    function toggleTheme() {
-        document.body.classList.toggle("light");
-        const isLight = document.body.classList.contains("light");
-        document.getElementById("themeIcon").classList.toggle("fa-sun", isLight);
-        document.getElementById("themeIcon").classList.toggle("fa-moon", !isLight);
-        localStorage.setItem("tift_theme", isLight ? "light" : "dark");
-    }
-
-    // Свайпы
-    let touchstartX = 0;
-    document.addEventListener('touchstart', e => touchstartX = e.changedTouches[0].screenX);
-    document.addEventListener('touchend', e => {
-        const touchendX = e.changedTouches[0].screenX;
-        if (touchstartX - touchendX > 50) { currentDayIndex = (currentDayIndex % 7) + 1; renderDay(); }
-        if (touchendX - touchstartX > 50) { currentDayIndex = ((currentDayIndex - 2 + 7) % 7) + 1; renderDay(); }
-    });
-
-    // Инициализация
-    window.onload = () => {
-        const savedGroup = localStorage.getItem("tift_group") || "ИС-22";
-        document.getElementById("groupSelect").value = savedGroup;
-        if (localStorage.getItem("tift_theme") === "light") toggleTheme();
-        renderDay();
-        setInterval(renderDay, 60000);
-        setInterval(updateProgress, 30000);
-
-        // Push-уведомления (если разрешить)
-        if ("Notification" in window && Notification.permission === "default") {
-            setTimeout(() => Notification.requestPermission(), 5000);
-        }
-    };
-</script>
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </body>
 </html>
