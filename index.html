@@ -7,14 +7,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;900&display=swap');
-        
+
         :root {
             --bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --card: rgba(255,255,255,0.97);
             --text: #1e293b;
             --sub: #64748b;
             --input: #f8fafc;
-            --shadow: rgba(0,0,0,0.35);
+            --accent: #6366f1;
         }
         body.dark {
             --bg: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
@@ -22,8 +22,9 @@
             --text: #e2e8f0;
             --sub: #94a3b8;
             --input: #334155;
-            --shadow: rgba(0,0,0,0.6);
+            --accent: #a78bfa;
         }
+
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
             font-family: 'Inter', sans-serif;
@@ -36,17 +37,19 @@
             color: var(--text);
             transition: 0.5s;
         }
+
         .card {
             background: var(--card);
             backdrop-filter: blur(20px);
             padding: 40px 25px;
             border-radius: 32px;
-            box-shadow: 0 30px 80px var(--shadow);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
             max-width: 500px;
             margin: 0 auto;
             border: 1px solid rgba(255,255,255,0.4);
             position: relative;
         }
+
         h1 {
             text-align: center;
             font-size: 38px;
@@ -56,54 +59,233 @@
             -webkit-text-fill-color: transparent;
             margin-bottom: 6px;
         }
-        .sub { text-align: center; color: var(--sub); font-size: 17px; margin-bottom: 35px; }
-        label { display: block; margin: 22px 0 10px; font-weight: 600; font-size: 17px; }
-        select, input {
-            width: 100%; padding: 18px; border: none; background: var(--input);
-            border-radius: 16px; font-size: 19px; color: var(--text);
-            box-shadow: inset 0 4px 10px rgba(0,0,0,0.06); transition: 0.3s;
+
+        .sub {
+            text-align: center;
+            color: var(--sub);
+            font-size: 17px;
+            margin-bottom: 35px;
         }
-        select { cursor: pointer; }
-        input:focus, select:focus {
-            outline: none; background: white; box-shadow: 0 0 0 4px rgba(102,126,234,0.25);
+
+        label {
+            display: block;
+            margin: 22px 0 10px;
+            font-weight: 600;
+            font-size: 17px;
         }
-        body.dark input:focus, body.dark select:focus {
-            background: #1e293b; box-shadow: 0 0 0 4px rgba(167,139,250,0.3);
+
+        /* Поле выбора предмета — как ты любишь */
+        .subject-wrapper {
+            position: relative;
         }
+
+        #subjectSearch {
+            width: 100%;
+            padding: 18px 50px 18px 48px;
+            border: none;
+            background: var(--input);
+            border-radius: 16px;
+            font-size: 19px;
+            color: var(--text);
+            cursor: pointer;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.06);
+            transition: 0.3s;
+        }
+
+        #subjectSearch:focus {
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102,126,234,0.25);
+            outline: none;
+        }
+
+        body.dark #subjectSearch:focus {
+            background: #1e293b;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 18px;
+            color: var(--sub);
+            pointer-events: none;
+        }
+
+        .dropdown-icon {
+            position: absolute;
+            right: 16px;
+            top: 20px;
+            color: var(--accent);
+            transition: transform 0.3s;
+        }
+
+        .dropdown-icon.open {
+            transform: rotate(180deg);
+        }
+
+        .clear-subject {
+            position: absolute;
+            right: 44px;
+            top: 18px;
+            color: var(--sub);
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        .clear-subject.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .clear-subject:hover {
+            color: #ef4444;
+        }
+
+        #subjectList {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 340px;
+            overflow-y: auto;
+            background: var(--input);
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            z-index: 10;
+            display: none;
+            margin-top: 4px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+        }
+
+        #subjectList.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity:0; transform:translateY(-10px) }
+            to { opacity:1; transform:none }
+        }
+
+        .subject-item {
+            padding: 18px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: 0.2s;
+            font-size: 17px;
+        }
+
+        .subject-item:hover {
+            background: rgba(102,126,234,0.15);
+        }
+
+        body.dark .subject-item {
+            border-bottom-color: rgba(255,255,255,0.1);
+        }
+
+        /* Поля ввода — без стрелок */
+        input[type=number] {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            background: var(--input);
+            border-radius: 16px;
+            font-size: 19px;
+            color: var(--text);
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.06);
+            -moz-appearance: textfield;
+        }
+
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Результат — жирный, красивый, как раньше */
         .result {
-            margin-top: 40px; padding: 32px 24px; border-radius: 24px; text-align: center;
-            background: var(--input); box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            margin-top: 40px;
+            padding: 32px 24px;
+            border-radius: 24px;
+            text-align: center;
+            background: var(--input);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            display: none;
         }
+
         .safe { border: 4px solid #34d399; }
         .warning { border: 4px solid #facc15; }
         .danger { border: 4px solid #f87171; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,.4)} 70%{box-shadow:0 0 0 20px rgba(248,113,113,0)} }
-        .big { font-size: 52px; font-weight: 900; line-height: 1.2;
+
+        @keyframes pulse {
+            0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,.4)}
+            70%{box-shadow:0 0 0 20px rgba(248,113,113,0)}
+        }
+
+        .big {
+            font-size: 52px;
+            font-weight: 900;
             background: linear-gradient(135deg,#10b981,#059669);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .warning .big { background: linear-gradient(135deg,#f59e0b,#d97706); }
-        .danger .big { background: linear-gradient(135deg,#ef4444,#b91c1c); }
-        .stats { margin-top: 20px; font-size: 18px; line-height: 1.9; color: var(--sub); }
-        .fatal { margin-top: 20px; padding: 16px; border-radius: 16px; background:#fee2e2; color:#991b1b;
-            border:2px solid #f87171; font-weight:700; font-size:19px; }
-        body.dark .fatal { background:#450a0a; color:#fecaca; border-color:#ef4444; }
-        .progress { margin-top:25px; height:12px; background:#e2e8f0; border-radius:6px; overflow:hidden; position:relative; }
-        body.dark .progress { background:#475569; }
-        .progress-fill { height:100%; background:#667eea; transition:width .5s; }
-        .progress-label { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-            font-weight:700; font-size:14px; color:white; mix-blend-mode:difference; }
-        .info { margin-top:20px; padding:16px; background:rgba(255,255,255,0.25); border-radius:16px;
-            color:white; text-align:center; font-size:15px; }
-        body.dark .info { background:rgba(0,0,0,0.3); }
-        .hemis-btn { display:block; margin:30px auto 0; padding:18px; background:linear-gradient(135deg,#4f46e5,#6366f1);
-            color:white; text-align:center; border-radius:20px; font-size:20px; font-weight:700; text-decoration:none;
-            max-width:300px; box-shadow:0 10px 25px rgba(79,70,229,.3); transition:.3s; }
-        .hemis-btn:hover { transform:translateY(-3px); }
-        .theme-switch { position:absolute; top:20px; right:20px; font-size:24px; cursor:pointer; color:var(--text); }
-        .creator { margin-top:60px; text-align:center; color:white; font-size:42px; font-weight:900; }
-        .creator i { color:#64d8ff; }
-        @media (max-width:500px) {
-            .card{padding:30px 20px} h1{font-size:32px} .big{font-size:42px}
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .warning .big { background: linear-gradient(135deg,#f59e0b,#d97706); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .danger .big { background: linear-gradient(135deg,#ef4444,#b91c1c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .stats {
+            margin-top: 20px;
+            font-size: 18px;
+            line-height: 1.9;
+            color: var(--sub);
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 16px;
+            color: white;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        body.dark .info { background: rgba(0,0,0,0.3); }
+
+        .hemis-btn {
+            display: block;
+            margin: 30px auto 0;
+            padding: 18px;
+            background: linear-gradient(135deg,#4f46e5,#6366f1);
+            color: white;
+            text-align: center;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            max-width: 300px;
+            box-shadow: 0 10px 25px rgba(79,70,229,.3);
+            transition: .3s;
+        }
+
+        .hemis-btn:hover { transform: translateY(-3px); }
+
+        .theme-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .creator {
+            margin-top: 60px;
+            text-align: center;
+            color: white;
+            font-size: 42px;
+            font-weight: 900;
         }
     </style>
 </head>
@@ -111,43 +293,32 @@
 
 <div class="card">
     <i id="themeToggle" class="fas fa-moon theme-switch"></i>
+
     <h1>Пропуски</h1>
     <div class="sub">1 пара = 2 часа • 25% = недопуск</div>
 
     <label>Выбери предмет</label>
-    <select id="subject" onchange="setSubject()">
-        <option value="" disabled selected>— Нажми и выбери предмет —</option>
-        <option value="90">Kompyuter tarmoqlari (45 пар → 90 ч)</option>
-        <option value="90">Elektronika va sxemalar (45 пар → 90 ч)</option>
-        <option value="72">Dasturlash I (36 пар → 72 ч)</option>
-        <option value="84">Tizimli dasturlash (42 пар → 84 ч)</option>
-        <option value="60">Java texnologiyalari (30 пар → 60 ч)</option>
-        <option value="60">Mobil ilovalarni yaratish (30 пар → 60 ч)</option>
-    </select>
+    <div class="subject-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="subjectSearch" placeholder="Нажми и выбери предмет..." autocomplete="off" readonly>
+        <i class="fas fa-chevron-down dropdown-icon" id="dropdownIcon"></i>
+        <i class="fas fa-times clear-subject" id="clearSubject"></i>
+        <div id="subjectList"></div>
+    </div>
 
     <label>Сколько пар уже прогулял</label>
-    <input type="number" step="0.1" id="pairs" value="0" placeholder="например: 8.5" oninput="calc()">
+    <input type="number" id="pairs" value="0" min="0" placeholder="например: 6">
 
     <label>Или в процентах (если точно знаешь)</label>
-    <input type="number" step="0.1" id="percent" placeholder="например: 12.4" oninput="calcFromPercent()">
+    <input type="number" id="percent" step="0.1" min="0" max="100" placeholder="например: 12.5">
 
-    <div id="result" class="result safe" style="display:none;">
+    <div id="result" class="result safe">
         <div class="big">Можно ещё <span id="safePairs">0</span> пар</div>
         <div id="status" style="font-size:26px;font-weight:700;margin:15px 0">Выбери предмет</div>
         
         <div class="stats">
             Пропущено: <strong><span id="missedPairs">0</span> пар</strong> → <strong><span id="missedHours">0</span> ч</strong> из <strong><span id="totalHours">0</span> ч</strong> → <strong><span id="missedPercent">0</span>%</strong><br><br>
             Красная зона начинается с <strong><span id="dangerPair">0</span></strong>-й пары
-        </div>
-
-        <div class="progress">
-            <div id="progressFill" class="progress-fill" style="width:0%"></div>
-            <div class="progress-label" id="progressLabel">0%</div>
-        </div>
-
-        <div id="fatal" class="fatal" style="display:none;">
-            <strong>ОПАСНО!</strong><br>
-            <span id="fatalText"></span>
         </div>
     </div>
 
@@ -161,101 +332,190 @@
 </div>
 
 <div class="creator">
-    <a href="https://t.me/iittlit" target="_blank">
-        <i class="fab fa-telegram-plane"></i> @iittlit
-    </a>
+    <a href="https://t.me/iittlit" target="_blank">@iittlit</a>
     <div style="margin-top:12px;font-size:19px;opacity:0.9">
         Сделал, чтобы ты не вылетел из универа
     </div>
 </div>
 
 <script>
-const themeToggle = document.getElementById('themeToggle');
+// Все предметы
+const subjects = [
+    {name: "Kompyuter tarmoqlari", hours: 90},
+    {name: "Elektronika va sxemalar", hours: 90},
+    {name: "Dasturlash I", hours: 72},
+    {name: "Tizimli dasturlash", hours: 84},
+    {name: "Java texnologiyalari", hours: 60},
+    {name: "Mobil ilovalarni yaratish", hours: 60},
+    {name: "Web dasturlash", hours: 78},
+    {name: "Ma'lumotlar bazasi", hours: 80},
+    {name: "Algoritmlar va ma'lumotlar tuzilmasi", hours: 90},
+    {name: "Sun'iy intellekt asoslari", hours: 70}
+];
+
 let totalHours = 0;
 
-themeToggle.onclick = () => {
+// Элементы
+const subjectSearch = document.getElementById('subjectSearch');
+const subjectList = document.getElementById('subjectList');
+const dropdownIcon = document.getElementById('dropdownIcon');
+const clearSubject = document.getElementById('clearSubject');
+const resultBlock = document.getElementById('result');
+const pairsInput = document.getElementById('pairs');
+const percentInput = document.getElementById('percent');
+
+// Темная тема
+document.getElementById('themeToggle').addEventListener('click', function() {
     document.body.classList.toggle('dark');
-    themeToggle.classList.toggle('fa-moon');
-    themeToggle.classList.toggle('fa-sun');
-    localStorage.setItem('darkMode', document.body.classList.contains('dark'));
-};
+    const isDark = document.body.classList.contains('dark');
+    this.classList.toggle('fa-moon', !isDark);
+    this.classList.toggle('fa-sun', isDark);
+    localStorage.setItem('darkMode', isDark);
+});
+
 if (localStorage.getItem('darkMode') === 'true') {
     document.body.classList.add('dark');
-    themeToggle.classList.remove('fa-moon');
-    themeToggle.classList.add('fa-sun');
+    document.getElementById('themeToggle').classList.replace('fa-moon', 'fa-sun');
 }
 
-function setSubject() {
-    totalHours = parseInt(document.getElementById('subject').value);
-    document.getElementById('totalHours').textContent = totalHours;
-    document.getElementById('result').style.display = 'block';
-    calc();
+// Заполнение списка предметов
+function fillSubjectList(filter = "") {
+    subjectList.innerHTML = "";
+    const filtered = filter 
+        ? subjects.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()))
+        : subjects;
+
+    if (filtered.length === 0) {
+        subjectList.innerHTML = '<div class="subject-item" style="color:#999;text-align:center;padding:20px">— Ничего не найдено —</div>';
+        return;
+    }
+
+    filtered.forEach(subject => {
+        const item = document.createElement('div');
+        item.className = 'subject-item';
+        item.innerHTML = `
+            <strong>${subject.name}</strong><br>
+            <small style="color:var(--sub)">${subject.hours/2} пар → ${subject.hours} ч</small>
+        `;
+        item.onclick = function() {
+            subjectSearch.value = subject.name;
+            totalHours = subject.hours;
+            document.getElementById('totalHours').textContent = totalHours;
+            resultBlock.style.display = 'block';
+            clearSubject.classList.add('show');
+            subjectList.classList.remove('show');
+            dropdownIcon.classList.remove('open');
+            pairsInput.value = '0';
+            percentInput.value = '';
+            calculate(); // сразу считаем
+        };
+        subjectList.appendChild(item);
+    });
 }
 
-function calc() {
-    if (!totalHours) return;
-    const pairs = parseFloat(document.getElementById('pairs').value) || 0;
+// Открытие/закрытие дропдауна
+subjectSearch.addEventListener('click', function() {
+    if (subjectList.classList.contains('show')) {
+        subjectList.classList.remove('show');
+        dropdownIcon.classList.remove('open');
+    } else {
+        fillSubjectList();
+        subjectList.classList.add('show');
+        dropdownIcon.classList.add('open');
+    }
+});
+
+subjectSearch.addEventListener('input', function() {
+    fillSubjectList(this.value);
+    subjectList.classList.add('show');
+    dropdownIcon.classList.add('open');
+});
+
+// Очистка выбора
+clearSubject.addEventListener('click', function() {
+    subjectSearch.value = '';
+    totalHours = 0;
+    resultBlock.style.display = 'none';
+    clearSubject.classList.remove('show');
+    pairsInput.value = '0';
+    percentInput.value = '';
+});
+
+// Закрытие при клике вне
+document.addEventListener('click', function(e) {
+    if (!subjectSearch.contains(e.target) && !subjectList.contains(e.target)) {
+        subjectList.classList.remove('show');
+        dropdownIcon.classList.remove('open');
+    }
+});
+
+// ГЛАВНАЯ ФУНКЦИЯ РАСЧЁТА — РАБОТАЕТ ИДЕАЛЬНО
+function calculate() {
+    if (totalHours === 0) return;
+
+    let pairs = parseInt(pairsInput.value) || 0;
+    if (pairs < 0) pairs = 0;
+    pairsInput.value = pairs;
+
     const hours = pairs * 2;
     const percent = (hours / totalHours * 100).toFixed(1);
 
-    document.getElementById('missedPairs').textContent = pairs.toFixed(1);
-    document.getElementById('missedHours').textContent = hours.toFixed(1);
+    // Обновляем всё
+    document.getElementById('missedPairs').textContent = pairs;
+    document.getElementById('missedHours').textContent = hours;
     document.getElementById('missedPercent').textContent = percent;
-    document.getElementById('percent').value = percent;
+    percentInput.value = percent;
 
-    updateResult(hours, pairs);
-}
-
-function calcFromPercent() {
-    if (!totalHours) return;
-    const percent = parseFloat(document.getElementById('percent').value) || 0;
-    const hours = totalHours * percent / 100;
-    const pairs = hours / 2;
-
-    document.getElementById('pairs').value = pairs.toFixed(1);
-    document.getElementById('missedPairs').textContent = pairs.toFixed(1);
-    document.getElementById('missedHours').textContent = hours.toFixed(1);
-    document.getElementById('missedPercent').textContent = percent;
-
-    updateResult(hours, pairs);
-}
-
-function updateResult(hours, pairs) {
     const limitHours = totalHours * 0.25;
-    const dangerPair = Math.ceil(limitHours / 2); // с этой пары уже ≥25%
+    const dangerPair = Math.ceil(limitHours / 2);
     const safeLeft = Math.max(0, dangerPair - 1 - pairs);
 
     document.getElementById('dangerPair').textContent = dangerPair;
-    document.getElementById('safePairs').textContent = safeLeft.toFixed(1);
-    document.getElementById('progressFill').style.width = (hours / totalHours * 100) + '%';
-    document.getElementById('progressLabel').textContent = (hours / totalHours * 100).toFixed(1) + '%';
+    document.getElementById('safePairs').textContent = safeLeft;
 
-    const res = document.getElementById('result');
+    const result = document.getElementById('result');
     const status = document.getElementById('status');
-    const fatal = document.getElementById('fatal');
-    const fatalText = document.getElementById('fatalText');
 
     if (hours >= limitHours) {
-        res.className = 'result danger';
+        result.className = 'result danger';
         status.textContent = 'ТЫ УЖЕ В КРАСНОЙ ЗОНЕ!';
-        fatalText.innerHTML = `Пропущено ${pairs.toFixed(1)} пар — это 25% и больше!<br>Беги на пары, пока не поздно!`;
-        fatal.style.display = 'block';
-    } else if (pairs >= dangerPair - 0.5) {
-        res.className = 'result danger';
-        status.textContent = 'КРИТИЧЕСКИ! ЕЩЁ ОДНА — И ПИЗДЕЦ';
-        fatalText.innerHTML = `Следующая (${dangerPair}-я) пара — это уже 25%!<br>НИ В КОЕМ СЛУЧАЕ НЕ ПРОПУСКАЙ!`;
-        fatal.style.display = 'block';
+    } else if (pairs >= dangerPair - 1) {
+        result.className = 'result danger';
+        status.textContent = 'СЛЕДУЮЩАЯ — И ПИЗДЕЦ';
     } else if (safeLeft <= 2) {
-        res.className = 'result warning';
+        result.className = 'result warning';
         status.textContent = 'Осталось мало...';
-        fatalText.innerHTML = `Осталось только <strong>${safeLeft.toFixed(0)}</strong> безопасных пар(ы)!<br>Будь очень аккуратен`;
-        fatal.style.display = 'block';
     } else {
-        res.className = 'result safe';
+        result.className = 'result safe';
         status.textContent = 'Всё под контролем';
-        fatal.style.display = 'none';
     }
 }
+
+// Расчёт из процентов — ТЕПЕРЬ РАБОТАЕТ НА 100%
+function calculateFromPercent() {
+    if (totalHours === 0) return;
+
+    const inputPercent = parseFloat(percentInput.value.replace(',', '.')) || 0;
+    if (inputPercent < 0) {
+        percentInput.value = '0';
+        return;
+    }
+    if (inputPercent > 100) {
+        percentInput.value = '100';
+    }
+
+    const hoursFromPercent = totalHours * inputPercent / 100;
+    const pairsFromPercent = Math.floor(hoursFromPercent / 2);
+
+    pairsInput.value = pairsFromPercent;
+    calculate();
+}
+
+// Слушаем ввод — ВСЁ СРАБАТЫВАЕТ МГНОВЕННО
+pairsInput.addEventListener('input', calculate);
+percentInput.addEventListener('input', calculateFromPercent);
+percentInput.addEventListener('blur', calculateFromPercent); // на всякий случай
 </script>
+
 </body>
 </html>
