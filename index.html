@@ -1,521 +1,158 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Пропуски — не вылетишь</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;900&display=swap');
-
-        :root {
-            --bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --card: rgba(255,255,255,0.97);
-            --text: #1e293b;
-            --sub: #64748b;
-            --input: #f8fafc;
-            --accent: #6366f1;
-        }
-        body.dark {
-            --bg: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            --card: rgba(30,41,59,0.95);
-            --text: #e2e8f0;
-            --sub: #94a3b8;
-            --input: #334155;
-            --accent: #a78bfa;
-        }
-
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            min-height: 100vh;
-            padding: 20px 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            color: var(--text);
-            transition: 0.5s;
-        }
-
-        .card {
-            background: var(--card);
-            backdrop-filter: blur(20px);
-            padding: 40px 25px;
-            border-radius: 32px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-            max-width: 500px;
-            margin: 0 auto;
-            border: 1px solid rgba(255,255,255,0.4);
-            position: relative;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 38px;
-            font-weight: 900;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 6px;
-        }
-
-        .sub {
-            text-align: center;
-            color: var(--sub);
-            font-size: 17px;
-            margin-bottom: 35px;
-        }
-
-        label {
-            display: block;
-            margin: 22px 0 10px;
-            font-weight: 600;
-            font-size: 17px;
-        }
-
-        /* Поле выбора предмета — как ты любишь */
-        .subject-wrapper {
-            position: relative;
-        }
-
-        #subjectSearch {
-            width: 100%;
-            padding: 18px 50px 18px 48px;
-            border: none;
-            background: var(--input);
-            border-radius: 16px;
-            font-size: 19px;
-            color: var(--text);
-            cursor: pointer;
-            box-shadow: inset 0 4px 10px rgba(0,0,0,0.06);
-            transition: 0.3s;
-        }
-
-        #subjectSearch:focus {
-            background: white;
-            box-shadow: 0 0 0 4px rgba(102,126,234,0.25);
-            outline: none;
-        }
-
-        body.dark #subjectSearch:focus {
-            background: #1e293b;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 16px;
-            top: 18px;
-            color: var(--sub);
-            pointer-events: none;
-        }
-
-        .dropdown-icon {
-            position: absolute;
-            right: 16px;
-            top: 20px;
-            color: var(--accent);
-            transition: transform 0.3s;
-        }
-
-        .dropdown-icon.open {
-            transform: rotate(180deg);
-        }
-
-        .clear-subject {
-            position: absolute;
-            right: 44px;
-            top: 18px;
-            color: var(--sub);
-            cursor: pointer;
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.3s;
-        }
-
-        .clear-subject.show {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .clear-subject:hover {
-            color: #ef4444;
-        }
-
-        #subjectList {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            max-height: 340px;
-            overflow-y: auto;
-            background: var(--input);
-            border-radius: 0 0 16px 16px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
-            z-index: 10;
-            display: none;
-            margin-top: 4px;
-            border-top: 1px solid rgba(0,0,0,0.08);
-        }
-
-        #subjectList.show {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity:0; transform:translateY(-10px) }
-            to { opacity:1; transform:none }
-        }
-
-        .subject-item {
-            padding: 18px 20px;
-            cursor: pointer;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            transition: 0.2s;
-            font-size: 17px;
-        }
-
-        .subject-item:hover {
-            background: rgba(102,126,234,0.15);
-        }
-
-        body.dark .subject-item {
-            border-bottom-color: rgba(255,255,255,0.1);
-        }
-
-        /* Поля ввода — без стрелок */
-        input[type=number] {
-            width: 100%;
-            padding: 18px;
-            border: none;
-            background: var(--input);
-            border-radius: 16px;
-            font-size: 19px;
-            color: var(--text);
-            box-shadow: inset 0 4px 10px rgba(0,0,0,0.06);
-            -moz-appearance: textfield;
-        }
-
-        input[type=number]::-webkit-outer-spin-button,
-        input[type=number]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        /* Результат — жирный, красивый, как раньше */
-        .result {
-            margin-top: 40px;
-            padding: 32px 24px;
-            border-radius: 24px;
-            text-align: center;
-            background: var(--input);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
-            display: none;
-        }
-
-        .safe { border: 4px solid #34d399; }
-        .warning { border: 4px solid #facc15; }
-        .danger { border: 4px solid #f87171; animation: pulse 2s infinite; }
-
-        @keyframes pulse {
-            0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,.4)}
-            70%{box-shadow:0 0 0 20px rgba(248,113,113,0)}
-        }
-
-        .big {
-            font-size: 52px;
-            font-weight: 900;
-            background: linear-gradient(135deg,#10b981,#059669);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .warning .big { background: linear-gradient(135deg,#f59e0b,#d97706); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .danger .big { background: linear-gradient(135deg,#ef4444,#b91c1c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .stats {
-            margin-top: 20px;
-            font-size: 18px;
-            line-height: 1.9;
-            color: var(--sub);
-        }
-
-        .info {
-            margin-top: 20px;
-            padding: 16px;
-            background: rgba(255,255,255,0.25);
-            border-radius: 16px;
-            color: white;
-            text-align: center;
-            font-size: 15px;
-        }
-
-        body.dark .info { background: rgba(0,0,0,0.3); }
-
-        .hemis-btn {
-            display: block;
-            margin: 30px auto 0;
-            padding: 18px;
-            background: linear-gradient(135deg,#4f46e5,#6366f1);
-            color: white;
-            text-align: center;
-            border-radius: 20px;
-            font-size: 20px;
-            font-weight: 700;
-            text-decoration: none;
-            max-width: 300px;
-            box-shadow: 0 10px 25px rgba(79,70,229,.3);
-            transition: .3s;
-        }
-
-        .hemis-btn:hover { transform: translateY(-3px); }
-
-        .theme-switch {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text);
-        }
-
-        .creator {
-            margin-top: 60px;
-            text-align: center;
-            color: white;
-            font-size: 42px;
-            font-weight: 900;
-        }
-    </style>
+    <title>АТК-2451 | ЛЕГЕНДЫ TIFT</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&family=Exo+2:wght@600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    
+    <!-- Подключаем отдельный CSS файл -->
+    <link rel="stylesheet" href="in.css">
 </head>
-<body>
+<body style="scroll-behavior:smooth;">
+    <header>
+        <div class="nav-container">
+            <nav>
+                <ul>
+                    <li><a href="#" class="active" data-page="home">ГЛАВНАЯ</a></li>
+                    <li><a href="#" data-page="schedule">РАСПИСАНИЕ</a></li>
+                    <li><a href="#" data-page="legends">ЛЕГЕНДЫ</a></li>
+                    <li><a href="#" data-page="contact">СВЯЗЬ</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-<div class="card">
-    <i id="themeToggle" class="fas fa-moon theme-switch"></i>
+    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
 
-    <h1>Пропуски</h1>
-    <div class="sub">1 пара = 2 часа • 25% = недопуск</div>
-
-    <label>Выбери предмет</label>
-    <div class="subject-wrapper">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="subjectSearch" placeholder="Нажми и выбери предмет..." autocomplete="off" readonly>
-        <i class="fas fa-chevron-down dropdown-icon" id="dropdownIcon"></i>
-        <i class="fas fa-times clear-subject" id="clearSubject"></i>
-        <div id="subjectList"></div>
-    </div>
-
-    <label>Сколько пар уже прогулял</label>
-    <input type="number" id="pairs" value="0" min="0" placeholder="например: 6">
-
-    <label>Или в процентах (если точно знаешь)</label>
-    <input type="number" id="percent" step="0.1" min="0" max="100" placeholder="например: 12.5">
-
-    <div id="result" class="result safe">
-        <div class="big">Можно ещё <span id="safePairs">0</span> пар</div>
-        <div id="status" style="font-size:26px;font-weight:700;margin:15px 0">Выбери предмет</div>
-        
-        <div class="stats">
-            Пропущено: <strong><span id="missedPairs">0</span> пар</strong> → <strong><span id="missedHours">0</span> ч</strong> из <strong><span id="totalHours">0</span> ч</strong> → <strong><span id="missedPercent">0</span>%</strong><br><br>
-            Красная зона начинается с <strong><span id="dangerPair">0</span></strong>-й пары
+    <!-- ГЛАВНАЯ + НОВОСТИ -->
+    <div id="home" class="page active">
+        <div class="hero">
+            <h1>АТК-2451</h1>
+            <h2>T I F T</h2>
+            <p>МЫ НЕ ПРОСТО ГРУППА</p>
+        </div>
+        <div class="news-block">
+            <h2>НОВОСТИ</h2>
+            
+            <br>
+            <h1>Третий семестр: ❌ завершён</h1>
+            <h1>Сессия: ⏳ на подходе</h1>
+            <h1>Каникулы: 🎉 уже </h1>
+        <br>
+            <h1>Режим активирован:</h1>
+            </br>
+            <br>
+            <h1>1.Отдыхаем</h1>
+            <h1>2.Едим новогодние салаты</h1>
+            <h1>3.В панике повторяем билеты 31 декабря</h1>
+            <h1>4.Сдаём всё на 4 и 5 🎯</h1>
+            <h1>Мы крутые, мы справимся! 💥</h1>
+         </br>   
+        </br>    
         </div>
     </div>
 
-    <div class="info">
-        Пропустил пару → сразу +2 часа в журнале
+    <!-- РАСПИСАНИЕ -->
+    <div id="schedule" class="page">
+        <div class="container">
+            <h2 class="title">Отдыхаем</h2>
+            <h2 class="title">Скоро Сессия</h2>
+            
+            
+   
+            <div class="days-tabs">
+                <!--<button class="day-btn active" data-day="monday">ПН</button>
+                <button class="day-btn" data-day="tuesday">ВТ</button>
+                <button class="day-btn" data-day="wednesday">СР</button>
+                <button class="day-btn" data-day="thursday">ЧТ</button>
+                <button class="day-btn" data-day="friday"><h1>Отдыхаем⏳</h1></button>-->
+            </div>
+
+            <!--<table class="schedule-table active" id="monday">
+                <tr><th>№</th><th>Время</th><th>Предмет</th><th>Тип</th><th>Преподаватель</th><th>Аудитория</th></tr>
+                <tr><td>1</td><td>09:00</td><td>Diskret tuzulmalari</td><td class="type">Лекция</td><td>QULDASHEVA N. K.</td><td>301 (II-bino)</td></tr>
+                <tr><td>2</td><td>10:30</td><td>Diskret tuzulmalari</td><td class="type">Лекция</td><td>QULDASHEVA N. K.</td><td>Lab 09 (II-bino)</td></tr>
+                <tr><td>3</td><td>12:00</td><td>Elektonika va sxemalar 1</td><td class="type">Лекция</td><td>NASRIDDINOV B. Z.</td><td>301 (II-bino)</td></tr>
+                <tr><td>4</td><td>14:00</td><td>Kompyuter tarmoqlari</td><td class="type">Практика</td><td>NASRIDDINOV B. Z.</td><td>Lab 05 (II-bino)</td></tr>
+            </table>
+
+            <table class="schedule-table" id="tuesday">
+                <tr><th>№</th><th>Время</th><th>Предмет</th><th>Тип</th><th>Преподаватель</th><th>Аудитория</th></tr>
+                <tr><td>1</td><td>09:00</td><td>Kompyuter tarmoqlari</td><td class="type">Лекция</td><td>NASRIDDINOV B. Z.</td><td>Lab 03 (II-bino)</td></tr>
+                <tr><td>2</td><td>10:30</td><td>Ma'lumotlar bazasi</td><td class="type">Лекция</td><td>MUSADJANOVA D. A.</td><td>Lab 03 (II-bino)</td></tr>
+            </table>
+
+            <table class="schedule-table" id="wednesday">
+                <tr><th>№</th><th>Время</th><th>Предмет</th><th>Тип</th><th>Преподаватель</th><th>Аудитория</th></tr>
+                <tr><td>1</td><td>09:00</td><td>Elektonika va sxemalar 1</td><td class="type">Практика</td><td>NASRIDDINOV B. Z.</td><td>Lab 07 (II-bino)</td></tr>
+                <tr><td>2</td><td>10:30</td><td>Kompyuter tarmoqlari</td><td class="type">Практика</td><td>NASRIDDINOV B. Z.</td><td>Lab 03 (II-bino)</td></tr>
+                <tr><td>3</td><td>12:00</td><td>Ma'lumotlar bazasi</td><td class="type">Практика</td><td>MUSADJANOVA D. A.</td><td>Lab 03 (II-bino)</td></tr>
+            </table>
+
+            <table class="schedule-table" id="thursday">
+                <tr><th>№</th><th>Время</th><th>Предмет</th><th>Тип</th><th>Преподаватель</th><th>Аудитория</th></tr>
+                <tr><td>1</td><td>09:00</td><td>Ma'lumotlar bazasi</td><td class="type">Практика</td><td>MUSADJANOVA D. A.</td><td>Lab 05 (II-bino)</td></tr>
+                <tr><td>2</td><td>10:30</td><td>Elektonika va sxemalar 1</td><td class="type">Практика</td><td>NASRIDDINOV B. Z.</td><td>Lab 03 (II-bino)</td></tr>
+            </table>
+
+            <table class="schedule-table" id="friday">
+                <tr><th>№</th><th>Время</th><th>Предмет</th><th>Тип</th><th>Преподаватель</th><th>Аудитория</th></tr>
+                <tr><td>3</td><td>12:00</td><td>Chiziqli algebra</td><td class="type">Лекция</td><td>AKRAMOV N. S.</td><td>307 (II-bino)</td></tr>
+                <tr><td>4</td><td>14:00</td><td>Chiziqli algebra</td><td class="type">Практика</td><td>AKRAMOV N. S.</td><td>404 (II-bino)</td></tr>
+                <tr><td>5</td><td>15:30</td><td>Diskret tuzulmalari</td><td class="type">Практика</td><td>QULDASHEVA N. K.</td><td>Lab 09 (II-bino)</td></tr>
+            </table>-->
+        </div>
     </div>
 
-    <a href="https://my.hemis.uz/dashboard" target="_blank" class="hemis-btn">
-        Открыть Hemis
-    </a>
-</div>
-
-<div class="creator">
-    <a href="https://t.me/iittlit" target="_blank">@iittlit</a>
-    <div style="margin-top:12px;font-size:19px;opacity:0.9">
-        Сделал, чтобы ты не вылетел из универа
+    <!-- ЛЕГЕНДЫ АТК-2451 -->
+    <div id="legends" class="page">
+        <div class="container">
+            <h2 class="title">ЛЕГЕНДЫ АТК-2451</h2>
+            <div class="legends-grid">
+                <div class="legend-card"><h3>Бурхон легенда учитель</h3><a href="https://t.me/nsrnvbz" target="_blank">@nsrnvbz</a></div>
+                <div class="legend-card"><h3>Усмонбек Староста</h3><a href="https://t.me/aqua2508" target="_blank">@aqua2508</a></div>
+                <div class="legend-card"><h3>Тимур</h3><a href="https://t.me/iittlit" target="_blank">@iittlit</a></div>
+                <div class="legend-card"><h3>Сардорбек</h3><a href="https://t.me/RS_Pov" target="_blank">@RS_Pov</a></div>
+                <div class="legend-card"><h3>Умиджон</h3><a href="https://t.me/umid70_03" target="_blank">@umid70_03</a></div>
+                <div class="legend-card"><h3>Асаль</h3><a href="" target="_blank"> no name</a></div>
+                <div class="legend-card"><h3>Алиакбар</h3><a href="https://t.me/I1alia" target="_blank">@I1alia</a></div>
+                <div class="legend-card"><h3>Шахзод</h3><a href="https://t.me/Lszkan" target="_blank">@Lszkan</a></div>
+                <div class="legend-card"><h3>Достонбек</h3><a href="" target="_blank"> no name</a></div>
+                <div class="legend-card"><h3>Дарья</h3><a href="https://t.me/crazieso" target="_blank">@crazieso</a></div>
+                <div class="legend-card"><h3>Дониёр</h3><a href="https://t.me/doni_7466" target="_blank">@doni_7466</a></div>
+                <div class="legend-card"><h3>Марат</h3><a href="https://t.me/mara_festival" target="_blank">@mara_festival</a></div>
+            </div>
+        </div>
     </div>
-</div>
 
-<script>
-// Все предметы
-const subjects = [
-    {name: "Kompyuter tarmoqlari", hours: 90},
-    {name: "Elektronika va sxemalar", hours: 90},
-    {name: "Dasturlash I", hours: 72},
-    {name: "Tizimli dasturlash", hours: 84},
-    {name: "Java texnologiyalari", hours: 60},
-    {name: "Mobil ilovalarni yaratish", hours: 60},
-    {name: "Web dasturlash", hours: 78},
-    {name: "Ma'lumotlar bazasi", hours: 80},
-    {name: "Algoritmlar va ma'lumotlar tuzilmasi", hours: 90},
-    {name: "Sun'iy intellekt asoslari", hours: 70}
-];
+    <!-- СВЯЗЬ -->
+    <div id="contact" class="page">
+        <div class="container">
+            <h2 class="title">СВЯЗЬ</h2>
+            <div class="contact-card">
+                <h3 style="font-size:3rem; color:var(--primary);">Наша комнда здесь</h3>
+                <p style="font-size:2rem; margin:40px 0;">Баги, идеи, мемы, фотки — всё кидай ему</p>
+                <div style="margin-top:50px;">
+                    <p style="font-size:2.5rem; margin-bottom:20px;"><strong>Сайт создал</strong></p>
+                    <a href="https://t.me/iittlit" target="_blank" style="color:var(--secondary); font-size:4rem; font-weight:900;">Tima</a>
+                    <p style="margin-top:20px; font-size:2rem;">Староста </p>
+                    <a href="https://t.me/aqua2508" target="_blank" style="color:var(--secondary); font-size:4rem; font-weight:900;">Усмон</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-let totalHours = 0;
+    <footer>
+        <p style="font-size:2rem;"><strong>АТК-2451 — ЛУЧШАЯ ГРУППА ВО ВСЕЛЕННОЙ</strong></p>
+        <p style="margin-top:20px; font-size:1.6rem;">
+            Сайт сделал — <a href="https://t.me/iittlit" style="color:var(--primary); font-weight:900;">Tima</a>
+        </p>
+    </footer>
 
-// Элементы
-const subjectSearch = document.getElementById('subjectSearch');
-const subjectList = document.getElementById('subjectList');
-const dropdownIcon = document.getElementById('dropdownIcon');
-const clearSubject = document.getElementById('clearSubject');
-const resultBlock = document.getElementById('result');
-const pairsInput = document.getElementById('pairs');
-const percentInput = document.getElementById('percent');
-
-// Темная тема
-document.getElementById('themeToggle').addEventListener('click', function() {
-    document.body.classList.toggle('dark');
-    const isDark = document.body.classList.contains('dark');
-    this.classList.toggle('fa-moon', !isDark);
-    this.classList.toggle('fa-sun', isDark);
-    localStorage.setItem('darkMode', isDark);
-});
-
-if (localStorage.getItem('darkMode') === 'true') {
-    document.body.classList.add('dark');
-    document.getElementById('themeToggle').classList.replace('fa-moon', 'fa-sun');
-}
-
-// Заполнение списка предметов
-function fillSubjectList(filter = "") {
-    subjectList.innerHTML = "";
-    const filtered = filter 
-        ? subjects.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()))
-        : subjects;
-
-    if (filtered.length === 0) {
-        subjectList.innerHTML = '<div class="subject-item" style="color:#999;text-align:center;padding:20px">— Ничего не найдено —</div>';
-        return;
-    }
-
-    filtered.forEach(subject => {
-        const item = document.createElement('div');
-        item.className = 'subject-item';
-        item.innerHTML = `
-            <strong>${subject.name}</strong><br>
-            <small style="color:var(--sub)">${subject.hours/2} пар → ${subject.hours} ч</small>
-        `;
-        item.onclick = function() {
-            subjectSearch.value = subject.name;
-            totalHours = subject.hours;
-            document.getElementById('totalHours').textContent = totalHours;
-            resultBlock.style.display = 'block';
-            clearSubject.classList.add('show');
-            subjectList.classList.remove('show');
-            dropdownIcon.classList.remove('open');
-            pairsInput.value = '0';
-            percentInput.value = '';
-            calculate(); // сразу считаем
-        };
-        subjectList.appendChild(item);
-    });
-}
-
-// Открытие/закрытие дропдауна
-subjectSearch.addEventListener('click', function() {
-    if (subjectList.classList.contains('show')) {
-        subjectList.classList.remove('show');
-        dropdownIcon.classList.remove('open');
-    } else {
-        fillSubjectList();
-        subjectList.classList.add('show');
-        dropdownIcon.classList.add('open');
-    }
-});
-
-subjectSearch.addEventListener('input', function() {
-    fillSubjectList(this.value);
-    subjectList.classList.add('show');
-    dropdownIcon.classList.add('open');
-});
-
-// Очистка выбора
-clearSubject.addEventListener('click', function() {
-    subjectSearch.value = '';
-    totalHours = 0;
-    resultBlock.style.display = 'none';
-    clearSubject.classList.remove('show');
-    pairsInput.value = '0';
-    percentInput.value = '';
-});
-
-// Закрытие при клике вне
-document.addEventListener('click', function(e) {
-    if (!subjectSearch.contains(e.target) && !subjectList.contains(e.target)) {
-        subjectList.classList.remove('show');
-        dropdownIcon.classList.remove('open');
-    }
-});
-
-// ГЛАВНАЯ ФУНКЦИЯ РАСЧЁТА — РАБОТАЕТ ИДЕАЛЬНО
-function calculate() {
-    if (totalHours === 0) return;
-
-    let pairs = parseInt(pairsInput.value) || 0;
-    if (pairs < 0) pairs = 0;
-    pairsInput.value = pairs;
-
-    const hours = pairs * 2;
-    const percent = (hours / totalHours * 100).toFixed(1);
-
-    // Обновляем всё
-    document.getElementById('missedPairs').textContent = pairs;
-    document.getElementById('missedHours').textContent = hours;
-    document.getElementById('missedPercent').textContent = percent;
-    percentInput.value = percent;
-
-    const limitHours = totalHours * 0.25;
-    const dangerPair = Math.ceil(limitHours / 2);
-    const safeLeft = Math.max(0, dangerPair - 1 - pairs);
-
-    document.getElementById('dangerPair').textContent = dangerPair;
-    document.getElementById('safePairs').textContent = safeLeft;
-
-    const result = document.getElementById('result');
-    const status = document.getElementById('status');
-
-    if (hours >= limitHours) {
-        result.className = 'result danger';
-        status.textContent = 'ТЫ УЖЕ В КРАСНОЙ ЗОНЕ!';
-    } else if (pairs >= dangerPair - 1) {
-        result.className = 'result danger';
-        status.textContent = 'СЛЕДУЮЩАЯ — И ПИЗДЕЦ';
-    } else if (safeLeft <= 2) {
-        result.className = 'result warning';
-        status.textContent = 'Осталось мало...';
-    } else {
-        result.className = 'result safe';
-        status.textContent = 'Всё под контролем';
-    }
-}
-
-// Расчёт из процентов — ТЕПЕРЬ РАБОТАЕТ НА 100%
-function calculateFromPercent() {
-    if (totalHours === 0) return;
-
-    const inputPercent = parseFloat(percentInput.value.replace(',', '.')) || 0;
-    if (inputPercent < 0) {
-        percentInput.value = '0';
-        return;
-    }
-    if (inputPercent > 100) {
-        percentInput.value = '100';
-    }
-
-    const hoursFromPercent = totalHours * inputPercent / 100;
-    const pairsFromPercent = Math.floor(hoursFromPercent / 2);
-
-    pairsInput.value = pairsFromPercent;
-    calculate();
-}
-
-// Слушаем ввод — ВСЁ СРАБАТЫВАЕТ МГНОВЕННО
-pairsInput.addEventListener('input', calculate);
-percentInput.addEventListener('input', calculateFromPercent);
-percentInput.addEventListener('blur', calculateFromPercent); // на всякий случай
-</script>
-
+    <!-- Подключаем отдельный JS файл -->
+    <script src="in2.js"></script>
 </body>
 </html>
