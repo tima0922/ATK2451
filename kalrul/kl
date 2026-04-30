@@ -1,1 +1,289 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✨ Pony Binary Calculator ✨</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(135deg, #ff9ff3, #54a0ff, #5f27cd);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
 
+    .calculator {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 30px;
+      padding: 25px 20px;
+      width: 380px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border: 8px solid #ff6b9d;
+      position: relative;
+    }
+
+    .calculator::before {
+      content: "🦄";
+      font-size: 60px;
+      position: absolute;
+      top: -40px;
+      right: 30px;
+      z-index: 10;
+      filter: drop-shadow(0 5px 10px pink);
+    }
+
+    h1 {
+      text-align: center;
+      color: #ff6b9d;
+      margin: 0 0 15px 0;
+      font-size: 28px;
+      text-shadow: 2px 2px 4px rgba(255, 105, 180, 0.5);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #5f27cd;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .display {
+      background: #1e1e2f;
+      border: 6px solid #ff9ff3;
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 20px;
+      min-height: 120px;
+      text-align: right;
+      box-shadow: inset 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    #expression {
+      font-size: 32px;
+      color: #54a0ff;
+      font-weight: bold;
+      min-height: 40px;
+      word-break: break-all;
+    }
+
+    #result {
+      font-size: 22px;
+      color: #00d2d3;
+      margin-top: 10px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    button {
+      padding: 18px 10px;
+      font-size: 22px;
+      border: none;
+      border-radius: 18px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    button:active {
+      transform: scale(0.92) translateY(3px);
+    }
+
+    .digit {
+      background: #ff9ff3;
+      color: #1e1e2f;
+    }
+
+    .operator {
+      background: #ff6b9d;
+      color: white;
+    }
+
+    .equals {
+      background: linear-gradient(45deg, #00d2d3, #54a0ff);
+      color: white;
+      grid-column: span 2;
+    }
+
+    .clear {
+      background: #ff4757;
+      color: white;
+    }
+
+    .backspace {
+      background: #ffa502;
+      color: white;
+    }
+
+    .pony-footer {
+      text-align: center;
+      margin-top: 15px;
+      color: #5f27cd;
+      font-size: 14px;
+    }
+
+    .heart {
+      color: #ff4757;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calculator">
+    <h1>✨ Pony Binary ✨</h1>
+    <p class="subtitle">Милый двоичный калькулятор 💖</p>
+
+    <div class="display">
+      <div id="expression">0</div>
+      <div id="result">Десятичный: 0</div>
+    </div>
+
+    <div class="buttons">
+      <button class="clear" onclick="clearAll()">AC</button>
+      <button class="backspace" onclick="backspace()">←</button>
+      <button class="operator" onclick="addOperator('/')">÷</button>
+      <button class="operator" onclick="addOperator('*')">×</button>
+
+      <button class="digit" onclick="addDigit('1')">1</button>
+      <button class="digit" onclick="addDigit('0')">0</button>
+      <button class="operator" onclick="addOperator('+')">+</button>
+      <button class="operator" onclick="addOperator('-')">-</button>
+
+      <button class="digit" onclick="addDigit('1')">1</button>
+      <button class="digit" onclick="addDigit('0')">0</button>
+      <button class="digit" onclick="addDigit('1')">1</button>
+      <button class="digit" onclick="addDigit('0')">0</button>
+
+      <button class="operator" onclick="addOperator('*')">×</button>
+      <button class="operator" onclick="addOperator('/')">÷</button>
+      <button class="equals" onclick="calculate()">=</button>
+    </div>
+
+    <div class="pony-footer">
+      Сделано с ❤️ для любителей пони
+    </div>
+  </div>
+
+  <script>
+    let expression = "0";
+    let shouldReset = false;
+
+    function updateDisplay() {
+      document.getElementById("expression").textContent = expression;
+      
+      try {
+        if (expression === "0" || shouldReset) {
+          document.getElementById("result").textContent = "Десятичный: 0";
+          return;
+        }
+
+        // Парсим выражение
+        let parts = expression.split(/([+\-*/])/).filter(Boolean);
+        
+        if (parts.length === 3) {
+          let a = parseInt(parts[0], 2);
+          let b = parseInt(parts[2], 2);
+          let op = parts[1];
+          
+          let result;
+          if (op === '+') result = a + b;
+          else if (op === '-') result = a - b;
+          else if (op === '*') result = a * b;
+          else if (op === '/') result = b !== 0 ? (a / b).toFixed(2) : "Ошибка";
+
+          document.getElementById("result").textContent = 
+            `Десятичный: ${result}`;
+        }
+      } catch(e) {
+        document.getElementById("result").textContent = "Десятичный: —";
+      }
+    }
+
+    function addDigit(digit) {
+      if (shouldReset || expression === "0") {
+        expression = digit;
+        shouldReset = false;
+      } else {
+        expression += digit;
+      }
+      updateDisplay();
+    }
+
+    function addOperator(op) {
+      if (shouldReset) shouldReset = false;
+      // Заменяем последний оператор, если он уже есть
+      if (/[+\-*/]$/.test(expression)) {
+        expression = expression.slice(0, -1) + op;
+      } else {
+        expression += op;
+      }
+      updateDisplay();
+    }
+
+    function calculate() {
+      try {
+        let parts = expression.split(/([+\-*/])/).filter(Boolean);
+        if (parts.length !== 3) return;
+
+        let a = parseInt(parts[0], 2);
+        let b = parseInt(parts[2], 2);
+        let op = parts[1];
+
+        let result;
+        if (op === '+') result = a + b;
+        else if (op === '-') result = a - b;
+        else if (op === '*') result = a * b;
+        else if (op === '/') {
+          if (b === 0) throw new Error();
+          result = a / b;
+        }
+
+        let binResult = Math.floor(result).toString(2);
+        
+        expression = binResult;
+        shouldReset = true;
+
+        document.getElementById("result").textContent = 
+          `Десятичный: ${result.toFixed(2)}`;
+
+        updateDisplay();
+      } catch(e) {
+        expression = "Ошибка";
+        shouldReset = true;
+        updateDisplay();
+      }
+    }
+
+    function clearAll() {
+      expression = "0";
+      shouldReset = false;
+      updateDisplay();
+    }
+
+    function backspace() {
+      if (shouldReset) {
+        clearAll();
+        return;
+      }
+      if (expression.length > 1) {
+        expression = expression.slice(0, -1);
+      } else {
+        expression = "0";
+      }
+      updateDisplay();
+    }
+
+    // Инициализация
+    updateDisplay();
+  </script>
+</body>
+</html>
